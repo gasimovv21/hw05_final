@@ -79,5 +79,5 @@ class Follow(CreatedModel):
     )
 
     class Meta:
-        models.UniqueConstraint(fields=['user', 'author'], 
+        models.UniqueConstraint(fields=['user', 'author'],
                                 name='unique_booking')

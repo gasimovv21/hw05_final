@@ -10,9 +10,10 @@ def http_version_not_supported(request, *args, **argv):
 
 
 def forbidden(request, exception):
-    return render(request, 'core/403.html', 
-                 {'path': request.path}, 
-                 status=403)
+    return render(request,
+                  'core/403.html',
+                  {'path': request.path},
+                  status=403)
 
 
 def csrf_failure(request, reason=''):
