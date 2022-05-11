@@ -192,7 +192,8 @@ class StaticURLTests(TestCase):
         self.assertEqual(len(post_object), 0)
 
     def test_user_can_follow_and_unfollow(self):
-        """Проверка, что авторизованный пользователь может подписаться и отписаться"""
+        """Проверка, что авторизованный пользователь может подписаться 
+        и отписаться"""
         url_list = {
             self.url_post_profile_follow,
             self.url_post_profile_unfollow,
