@@ -208,7 +208,7 @@ class StaticURLTests(TestCase):
         Follow.objects.get_or_create(user=self.user, author=self.post.author)
         follow_count_before_delete = Follow.objects.count()
         Follow.objects.filter(
-            user=self.user, 
+            user=self.user,
             author__username=self.user.username).delete()
         self.assertEqual(self.follow_count, follow_count_before_delete - 1)
 
@@ -229,8 +229,8 @@ class StaticURLTests(TestCase):
     def test_comments(self):
         """Тест комментарий"""
         Comment.objects.create(
-            text=self.post.text, 
-            author=self.user, 
+            text=self.post.text,
+            author=self.user,
             post=self.post)
         comment_count2 = Comment.objects.count()
         self.assertEqual(comment_count2, self.comment_count + 1)
