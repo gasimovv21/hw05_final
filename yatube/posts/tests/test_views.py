@@ -3,12 +3,13 @@ from http import HTTPStatus
 
 from django.contrib.auth import get_user_model
 from django.conf import settings
+from django.core.cache import cache
 from django.test import TestCase, Client
 from django.urls import reverse
 from django import forms
 
-from posts.forms import PostForm
-from posts.models import Post, Group
+from posts.forms import PostForm, CommentForm
+from posts.models import Post, Group, Follow, Comment
 from core.views import page_not_found
 
 User = get_user_model()
@@ -21,6 +22,7 @@ class StaticURLTests(TestCase):
     def setUpClass(cls):
         super().setUpClass()
         cls.user = User.objects.create_user(username='auth')
+        cls.notfollower = User.objects.create_user(username='hatefollow')
         cls.group = Group.objects.create(
             title='Тестовая группа',
             slug='test_slug',
@@ -37,6 +39,13 @@ class StaticURLTests(TestCase):
     def setUp(self):
         self.authorized_client = Client()
         self.authorized_client.force_login(self.user)
+        self.not_follower = Client()
+        self.not_follower.force_login(self.notfollower)
+        self.url_index = reverse('posts:index')
+        self.follow_count = Follow.objects.count()
+        self.comment_count = Comment.objects.count()
+        self.url_follow_index = reverse('posts:follow_index')
+        self.url_add_comment = reverse('posts:add_comment', args=(self.post.id,))
 
     def test_pages_uses_correct_template(self):
         """URL-адрес использует соответствующий шаблон."""
@@ -72,7 +81,7 @@ class StaticURLTests(TestCase):
         self.assertEqual(response_object.text, self.post.text)
         self.assertEqual(response_object.group, self.post.group)
         self.assertEqual(response_object.pub_date, self.post.pub_date)
-        self.assertEqual(response_object.image, self.post.image)
+        self.assertContains(response, '<img')
 
     def test_index_show_correct_context(self):
         """Шаблон index сформирован с правильным контекстом."""
@@ -173,3 +182,55 @@ class StaticURLTests(TestCase):
         page_object = response.context['page_obj']
         self.assertEqual(response.status_code, HTTPStatus.OK)
         self.assertEqual(len(page_object), 0)
+
+    def test_cache_for_index_page(self):
+        """Тест кеша главной страницы!"""
+        response = self.client.get(self.url_index)
+        post_count = Post.objects.count()
+        Post.objects.get(id=self.post.id).delete()
+        response2 = self.client.get(self.url_index)
+        self.assertEqual(response.content, response2.content)
+        post_count2 = Post.objects.count()
+        cache.clear()
+        self.assertEqual(post_count - 1, post_count2)
+        response3 = self.client.get(self.url_index)
+        self.assertNotEqual(response3.content, response.content)
+
+    def test_profile_follow(self):
+        """Тест на подписку"""
+        Follow.objects.get_or_create(user=self.user, author=self.post.author)
+        follow_count2 = Follow.objects.count()
+        self.assertEqual(follow_count2, self.follow_count + 1)
+
+    def test_profile_unfollow(self):
+        """Тест на проверку отписки"""
+        Follow.objects.get_or_create(user=self.user, author=self.post.author)
+        follow_count_before_delete = Follow.objects.count()
+        Follow.objects.filter(user=self.user, author__username=self.user.username).delete()
+        self.assertEqual(self.follow_count, follow_count_before_delete - 1)
+
+    def test_no_follower(self):
+        """Проверка, что у не фаловера в фоллоу индексе пагинатор пустой"""
+        Follow.objects.get_or_create(user=self.user, author=self.post.author)
+        response = self.not_follower.get(self.url_follow_index)
+        page_object = response.context['page_obj']
+        self.assertEqual(response.status_code, HTTPStatus.OK)
+        self.assertEqual(len(page_object), 0)
+    
+    def test_anonim_cannot_follow(self):
+        """Проверка что аноним не может подписоваться!"""
+        response = self.client.get(self.url_follow_index)
+        self.assertEqual(response.status_code, HTTPStatus.FOUND)
+        self.assertEqual(self.follow_count, 0)
+    
+    def test_comments(self):
+        """Тест комментарий"""
+        Comment.objects.create(text=self.post.text, author=self.user, post=self.post)
+        comment_count2 = Comment.objects.count()
+        self.assertEqual(comment_count2, self.comment_count + 1)
+
+    def test_anonim_cannot_leave_comment(self):
+        """Проверка что аноним не может комментировать!"""
+        response = self.client.get(self.url_add_comment)
+        self.assertEqual(response.status_code, HTTPStatus.FOUND)
+        self.assertEqual(self.comment_count, 0)

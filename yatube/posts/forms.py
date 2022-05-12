@@ -17,12 +17,13 @@ class PostForm(forms.ModelForm):
     def clean_subject(self):
         data = self.cleaned_data['text']
         if data == '':
-            raise forms.ValidationError('Вы обязательно заполнить это поле!')
+            raise forms.ValidationError('Поле не может быть пустым!')
         return data
 
 
 class CommentForm(forms.ModelForm):
     class Meta:
         model = Comment
-        fields = ("text", )
-        help_text = {"text": "Добавьте комментарий"}
+        fields = 'text', 
+        labels = {'text': 'Текст комментарий'}
+        help_texts = {"text": "Добавьте комментарий"}

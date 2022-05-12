@@ -50,6 +50,8 @@ class Post(CreatedModel):
 
 
 class Comment(CreatedModel):
+    text = models.TextField(verbose_name='Добавьте комментарий',
+                            help_text='Добавьте текст поста!')
     post = models.ForeignKey(
         Post,
         related_name='comments',
@@ -60,10 +62,9 @@ class Comment(CreatedModel):
         related_name='comments',
         on_delete=models.CASCADE,
     )
-    text = models.TextField(verbose_name='Добавьте комментарий')
 
     def __str__(self):
-        return self.text
+        return f'{self.text[:30]}'
 
 
 class Follow(CreatedModel):

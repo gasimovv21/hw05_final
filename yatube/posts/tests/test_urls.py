@@ -40,6 +40,10 @@ class StaticURLTests(TestCase):
             ('posts:post_detail', (self.post.id,)),
             ('posts:post_create', None),
             ('posts:post_edit', (self.post.id,)),
+            ('posts:post_delete', (self.post.id,)),
+            ('posts:follow_index', None),
+            ('posts:profile_follow', (self.user,)),
+            ('posts:profile_unfollow', (self.user,)),
         )
         self.comment_count = Comment.objects.count()
         self.post_count = Post.objects.count()
@@ -50,6 +54,7 @@ class StaticURLTests(TestCase):
         self.url_post_follow_index = reverse(
             'posts:follow_index')
         self.url_index = reverse('posts:index')
+        self.url_profile = reverse('posts:profile', args=(self.user,))
 
     def test_urls_uses_correct_template(self):
         """URL-адреса используют соотвествующие шаблоны"""
@@ -91,16 +96,27 @@ class StaticURLTests(TestCase):
         """Все URLS доступны автору"""
         for name, argument in self.testing_urls:
             with self.subTest(name=name):
-                response = self.author_authorized_client.get(
-                    reverse(name, args=argument)
-                )
-                self.assertEqual(response.status_code, HTTPStatus.OK)
+                if name in ['posts:profile_follow', 'posts:profile_unfollow']:
+                    response_argument = reverse(name, args=argument)
+                    response_variable_profile = reverse(
+                        'posts:profile', args=argument
+                    )
+                    response = self.author_authorized_client.get(
+                        response_argument, follow=True
+                    )
+                    self.assertRedirects(response, response_variable_profile)
+                else:
+                    response = self.author_authorized_client.get(
+                        reverse(name, args=argument)
+                    )
+                    self.assertEqual(response.status_code, HTTPStatus.OK)
 
     def test_all_urls_except_edit_available_for_noauthor(self):
         """Все URLS, кроме edit доступны не автору"""
         for name, argument in self.testing_urls:
             with self.subTest(name=name):
-                if name == 'posts:post_edit':
+                if name in ['posts:post_edit',
+                            'posts:post_delete',]:
                     response_variable_post_edit = reverse(
                         'posts:post_edit', args=argument
                     )
@@ -115,13 +131,22 @@ class StaticURLTests(TestCase):
                 else:
                     response = self.not_author_authorized_client.get(
                         reverse(name, args=argument))
-                    self.assertEqual(response.status_code, HTTPStatus.OK)
+                    if name in ['posts:profile_follow',
+                                'posts:profile_unfollow',]:
+                        self.assertRedirects(response, self.url_profile)
+                    else:
+                        self.assertEqual(response.status_code, HTTPStatus.OK)
 
     def test_all_urls_except_edit_and_create_available_for_guest(self):
         """Все URLS, кроме edit и create доступны анониму"""
         for name, argument in self.testing_urls:
             with self.subTest(name=name):
-                if name in ['posts:post_edit', 'posts:post_create']:
+                if name in ['posts:post_edit',
+                            'posts:follow_index',
+                            'posts:post_create',
+                            'posts:profile_follow',
+                            'posts:profile_unfollow',
+                            'posts:post_delete',]:
                     response_argument = reverse(name, args=argument)
                     response_auth_login = reverse('users:login')
                     response = self.client.get(
@@ -202,13 +227,3 @@ class StaticURLTests(TestCase):
             response = self.not_author_authorized_client.get(url)
             expected_url = reverse('posts:profile', args=(self.user.username,))
             self.assertRedirects(response, expected_url)
-
-    def test_cache_for_index_page(self):
-        response = self.client.get(self.url_index)
-        post_count = Post.objects.count()
-        Post.objects.get(id=self.post.id).delete()
-        response2 = self.client.get(self.url_index)
-        self.assertEqual(response.content, response2.content)
-        post_count2 = Post.objects.count()
-        cache.clear()
-        self.assertEqual(post_count - 1, post_count2)

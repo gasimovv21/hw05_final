@@ -16,9 +16,15 @@ class PostAdmin(admin.ModelAdmin):
     list_filter = ('pub_date',)
     empty_value_display = '-пусто-'
 
-
-admin.site.register(Post, PostAdmin)
-admin.site.register(Group)
+class GroupAdmin(admin.ModelAdmin):
+    list_display = (
+        'pk',
+        'title',
+        'slug'
+    )
+    search_fields = ('title',)
+    list_filter = ('title',)
+    empty_value_display = '-пусто-'
 
 
 class CommentAdmin(admin.ModelAdmin):
@@ -30,10 +36,6 @@ class CommentAdmin(admin.ModelAdmin):
     )
     search_fields = ('text',)
     list_filter = ('pub_date',)
-    empty_value_display = '-пусто-'
-
-
-admin.site.register(Comment, CommentAdmin)
 
 
 class FollowAdmin(admin.ModelAdmin):
@@ -45,7 +47,9 @@ class FollowAdmin(admin.ModelAdmin):
     )
     search_fields = ('user',)
     list_filter = ('pub_date',)
-    empty_value_display = '-пусто-'
 
 
+admin.site.register(Post, PostAdmin)
+admin.site.register(Group, GroupAdmin)
+admin.site.register(Comment, CommentAdmin)
 admin.site.register(Follow, FollowAdmin)

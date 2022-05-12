@@ -20,19 +20,15 @@
     <p>{{ post.text|linebreaks }}</p>
     <a href="{% url 'posts:post_detail' post.id %}">Подробная информация </a>
     <br>
-    {% if post.group %} 
+    {% if not group %} 
       {% if post.group %} 
         <a href="{% url 'posts:group_list' post.group.slug %}"
         >
-          {%if not author.get_full_name and not group.title%}
-            #{{ post.group.title }}
-          {% elif author.get_full_name %}
             <hr>
               все записи группы  
-          {% endif %} 
         </a>
       {%else%}
-        <h6> Пост не относиться никакой группе </h6>  
+        <h6><span style="color: red;">Пост не относиться никакой группе </span></h6>  
       {% endif %}
     {% endif %}
    {% if not forloop.last %}<hr>{% endif %}

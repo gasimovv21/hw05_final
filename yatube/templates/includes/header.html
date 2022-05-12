@@ -28,7 +28,7 @@
             <a class="nav-link {% if view_name  == 'users:logout' %}active{% endif %}"
             href="{% url 'users:logout' %}">Выйти</a>
           </li>
-          <li>
+          <li class="nav-item">
             Пользователь: <a href="{% url 'posts:profile' user.username %}">{{ user.username }} </a>
           </li>
         {% else %}

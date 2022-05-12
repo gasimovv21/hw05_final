@@ -5,9 +5,15 @@
     <h1>
       Все посты пользователя : {{ author.get_full_name }}
     </h1>
-    <h3>
-      Всего постов: {{ author.posts.count }}
-    </h3>
+    <h2>
+      Всего публикаций: {{ author.posts.count }}
+    </h2>
+    <h5>
+      Всего подписок: {{author.follower.count}}
+    </h5>
+    <h5>
+      Всего подписчиков: {{ author.following.count }}
+    </h5>
     {% if author != user%}
       {% if following %}
         <a
