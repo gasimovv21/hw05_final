@@ -8,7 +8,7 @@ from django.test import TestCase, Client
 from django.urls import reverse
 from django import forms
 
-from posts.forms import PostForm, CommentForm
+from posts.forms import PostForm
 from posts.models import Post, Group, Follow, Comment
 from core.views import page_not_found
 
@@ -45,7 +45,8 @@ class StaticURLTests(TestCase):
         self.follow_count = Follow.objects.count()
         self.comment_count = Comment.objects.count()
         self.url_follow_index = reverse('posts:follow_index')
-        self.url_add_comment = reverse('posts:add_comment', args=(self.post.id,))
+        self.url_add_comment = reverse(
+            'posts:add_comment', args=(self.post.id,))
 
     def test_pages_uses_correct_template(self):
         """URL-адрес использует соответствующий шаблон."""
@@ -206,7 +207,9 @@ class StaticURLTests(TestCase):
         """Тест на проверку отписки"""
         Follow.objects.get_or_create(user=self.user, author=self.post.author)
         follow_count_before_delete = Follow.objects.count()
-        Follow.objects.filter(user=self.user, author__username=self.user.username).delete()
+        Follow.objects.filter(
+            user=self.user, 
+            author__username=self.user.username).delete()
         self.assertEqual(self.follow_count, follow_count_before_delete - 1)
 
     def test_no_follower(self):
@@ -216,16 +219,19 @@ class StaticURLTests(TestCase):
         page_object = response.context['page_obj']
         self.assertEqual(response.status_code, HTTPStatus.OK)
         self.assertEqual(len(page_object), 0)
-    
+
     def test_anonim_cannot_follow(self):
         """Проверка что аноним не может подписоваться!"""
         response = self.client.get(self.url_follow_index)
         self.assertEqual(response.status_code, HTTPStatus.FOUND)
         self.assertEqual(self.follow_count, 0)
-    
+
     def test_comments(self):
         """Тест комментарий"""
-        Comment.objects.create(text=self.post.text, author=self.user, post=self.post)
+        Comment.objects.create(
+            text=self.post.text, 
+            author=self.user, 
+            post=self.post)
         comment_count2 = Comment.objects.count()
         self.assertEqual(comment_count2, self.comment_count + 1)
 

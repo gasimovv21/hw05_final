@@ -116,7 +116,7 @@ class StaticURLTests(TestCase):
         for name, argument in self.testing_urls:
             with self.subTest(name=name):
                 if name in ['posts:post_edit',
-                            'posts:post_delete',]:
+                            'posts:post_delete']:
                     response_variable_post_edit = reverse(
                         'posts:post_edit', args=argument
                     )
@@ -132,7 +132,7 @@ class StaticURLTests(TestCase):
                     response = self.not_author_authorized_client.get(
                         reverse(name, args=argument))
                     if name in ['posts:profile_follow',
-                                'posts:profile_unfollow',]:
+                                'posts:profile_unfollow']:
                         self.assertRedirects(response, self.url_profile)
                     else:
                         self.assertEqual(response.status_code, HTTPStatus.OK)
@@ -146,7 +146,7 @@ class StaticURLTests(TestCase):
                             'posts:post_create',
                             'posts:profile_follow',
                             'posts:profile_unfollow',
-                            'posts:post_delete',]:
+                            'posts:post_delete']:
                     response_argument = reverse(name, args=argument)
                     response_auth_login = reverse('users:login')
                     response = self.client.get(
