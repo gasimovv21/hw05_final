@@ -1,40 +1,72 @@
 {% extends "base.html" %}
 {% block title %}Профайл пользователя {{ author.get_full_name }} {% endblock %}
+{% load cache %}
 {% block content %}
-  <div class="container py-5">
-    <h1>
-      Все посты пользователя : {{ author.get_full_name }}
-    </h1>
-    <h2>
-      Всего публикаций: {{ author.posts.count }}
-    </h2>
-    <h5>
-      Всего подписок: {{author.follower.count}}
-    </h5>
-    <h5>
-      Всего подписчиков: {{ author.following.count }}
-    </h5>
-    {% if author != user%}
-      {% if following %}
-        <a
-          class="btn btn-lg btn-light"
-          href="{% url 'posts:profile_unfollow' author.username %}" role="button"
-        >
-          Отписаться
-        </a>
-      {% else %}
-        <a
-          class="btn btn-lg btn-primary"
-          href="{% url 'posts:profile_follow' author.username %}" role="button"
-        >
-          Подписаться
-        </a>
-      {% endif %}
-    {% endif %}
-
-    {% for post in page_obj %}
-      {% include 'posts/includes/external_includes/post_includes.html' %}
-    {% endfor %}
-  </div>
-  {% include 'posts/includes/paginator.html' %}
+<div class="container">
+  <h1></h1>
+  <main role="main" class="container">
+    <div class="row">
+      <div class="col-md-3 mb-2 mt-2">
+        <div class="card">
+          <div class="card-body">
+            <div class="h3">
+              {{ author.get_full_name }}
+            </div>
+            <div class="h3 text-muted">
+              <a 
+                href="{% url 'posts:profile' author.username %}"
+                >@{{author.username}}
+              </a>
+            </div>
+          </div>
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item">
+              <div class="h7 text-muted">
+                Подписчики: {{ author.following.count }}
+                <br>
+                Подписки: {{ author.follower.count }} 
+              </div>
+            </li>
+            <li class="list-group-item">
+              <div class="h7 text-muted">
+                Публикации: {{ author.posts.count }}
+              </div>
+            </li>
+            <li class="list-group-item">
+              {% if author != user %}
+                {% if following %}
+                  <a
+                    class="btn btn-lg btn-light"
+                    href="{% url 'posts:profile_unfollow' author.username %}"
+                    role="button"
+                  >
+                    Отписаться
+                  </a>
+                {% else %}
+                  <a
+                    class="btn btn-lg btn-primary"
+                    href="{% url 'posts:profile_follow' author.username %}"
+                    role="button"
+                  >
+                    Подписаться
+                  </a>
+                {% endif %}
+              {% endif %}
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div class="col-md-9">
+        {% cache 20 index_page with page_obj %}
+        {% for post in page_obj %}
+          <div class="card mb-3 mt-1 shadow-sm">
+            {% include 'posts/includes/external_includes/post_includes.html' %}
+          </div>
+        {% endfor %}
+        {% include 'posts/includes/paginator.html' %}
+      </div>
+    </div>
+  </main>
+</div>
+{% endcache %}
 {% endblock %}

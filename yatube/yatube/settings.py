@@ -7,11 +7,12 @@ SECRET_KEY = '0=mz8l3ct68ae0sxsay%nq%qv7-#04!)eo&wu$&q6hon2tu&fg'
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    'localhost',
-    '127.0.0.1',
-    '[::1]',
-    'testserver',
-]
+     '*',
+     '127.0.0.1',
+     'www.gasimovv21.pythonanywhere.com',
+     'gasimovv21.pythonanywhere.com',
+    ]
+
 
 INSTALLED_APPS = [
     'users.apps.UsersConfig',

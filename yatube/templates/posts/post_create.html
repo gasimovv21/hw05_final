@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% load user_filters %}
+{% block title %}
+  Новый пост
+{% endblock %}
+{% block content %}
+  <div class="container py-5">
+    <div class="row justify-content-center">
+      <div class="col-md-8 p-5">
+        <div class="card">
+          <div class="card-header">Новый пост </div>
+            <div class="card-body">
+              {% include 'posts/includes/external_includes/errors_block.html'%}
+
+              <form method="post" enctype="multipart/form-data"
+                  {% if action_url %}
+                    action={% url "post_create" %}
+                  {% endif %}
+                >
+                {% csrf_token %}
+
+                {% include 'posts/includes/external_includes/check_the_form.html'%}
+                <div class="col-md-6 offset-md-10 mr-1">
+                  <button type="submit" class="btn btn-primary">
+                    Добавить
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

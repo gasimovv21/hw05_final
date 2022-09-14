@@ -1,30 +1,34 @@
 {% extends 'base.html' %}
 {% load user_filters %}
 {% block title %}
-  {% if form.instance.pk %}Редактировать пост{% else %}Новый пост{% endif %}
+  Редактирование записи
 {% endblock %}
 {% block content %}
   <div class="container py-5">
     <div class="row justify-content-center">
       <div class="col-md-8 p-5">
         <div class="card">
-          <div class="card-header">
-            {% if form.instance.pk %} Редактировать пост {% else %} Новый пост {% endif %}</div>
+          <div class="card-header">Редактирование записи </div>
             <div class="card-body">
               {% include 'posts/includes/external_includes/errors_block.html'%}
 
               <form method="post" enctype="multipart/form-data"
                   {% if action_url %}
-                    action={% if form.instance.pk %}"{% url 'post_edit' %}"{% else %}{% url 'post_create' %}{% endif %}
+                    action={% url "post_edit" %}
                   {% endif %}
                 >
                 {% csrf_token %}
 
                 {% include 'posts/includes/external_includes/check_the_form.html'%}
-                <div class="d-flex justify-content-end">
-                  <button type="submit" class="btn btn-primary">
-                    {% if form.instance.pk %} Сохранить {% else %} Добавить {% endif %}
-                  </button>
+                <div class="col-md-6 offset-md-7 mr-1">
+                    <a 
+                        class="btn btn-danger"
+                        href="{% url 'posts:post_delete' post.pk %}"
+                        role="button"> Удалить Пост
+                    </a>
+                    <button type="submit" class="btn btn-primary ml-l mr-l">
+                        Сохранить
+                    </button>
                 </div>
               </form>
             </div>

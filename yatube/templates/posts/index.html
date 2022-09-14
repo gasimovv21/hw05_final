@@ -2,14 +2,20 @@
 {% block title %}Последние обновления на сайте{% endblock %}
 {% load cache %}
 {% block content %}
-  <div class="container py-5">
+  <div class="container">
     <h1> Последние обновления на сайте </h1>
-    {% include 'posts/includes/switcher.html' %}
-    {% cache 20 index_page with page_obj %}
-    {% for post in page_obj %}
-        {% include 'posts/includes/external_includes/post_includes.html' %}
-    {% endfor %}
-{% endcache %}
+    <div class="container">
+      <div class="row">
+        {% include 'posts/includes/switcher.html' with index=True%}
+      </div>
+      {% cache 20 index_page with page_obj %}
+      {% for post in page_obj %}
+          <div class="card mb-3 mt-1 shadow-sm">
+            {% include 'posts/includes/external_includes/post_includes.html' %}
+          </div>
+      {% endfor %}
+      {% include 'posts/includes/paginator.html' %}
+    </div>
   </div>
-{% include 'posts/includes/paginator.html' %}
+{% endcache %}
 {%endblock%}

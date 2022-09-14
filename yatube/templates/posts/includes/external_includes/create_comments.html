@@ -2,44 +2,31 @@
 
 {% if user.is_authenticated %}
   <div class="card my-4">
-    <h5 class="card-header">Комментарий:</h5>
-    <div class="card-body">
       <form method="post" action="{% url 'posts:add_comment' post.id %}">
         {% csrf_token %}
 
+        <h5 class="card-header">Добавить комментарий:</h5>
         {% for field in form %}
-          <div class="form-group row my-3"
+          <div class="card-body"
             {% if field.field.required %} 
               aria-required="true"
             {% else %}
               aria-required="false"
             {% endif %}
           >
-            <label for="{{ field.id_for_label }}">
-                {{ field.label }}
-                {% if field.field.required %}
-                  <span class="required text-danger">*</span>
-                {% endif %}
-            </label>
-          </div>
-          <div class="form-group mb-2">
-            {{ field|addclass:"form-control" }}
-            {% if field.help_text %}
-              <small id="{{ field.id_for_label }}-help" class="form-text text-muted">
-                {{ field.help_text|safe }}
-              </small>
-            {% endif %}
+            <div class="form-group">
+              {{ field|addclass:"form-control" }}
+            </div>
+            <button type="submit" class="btn btn-primary">Отправить</button>
           </div>
         {%endfor%}
-        <button type="submit" class="btn btn-primary">Отправить</button>
       </form>
-    </div>
   </div>
 {% endif %}
-<h3> Все Комментарий пользователя: </h3>
+<h3> Комментарий: </h3>
 {% for comment in comments %}
-  <div class="media mb-4">
-    <div class="media-body">
+  <div class="media card mb-4">
+    <div class="media-body card-body">
       <h5 class="mt-0">
         <a href="{% url 'posts:profile' comment.author.username %}">
           {{ comment.author.username }}
@@ -48,6 +35,12 @@
         <p>
          {{ comment.text|linebreaks }}
         </p>
-      </div>
+        <small class="text-muted">{{ post.pub_date|date:"d E Y" }} г.</small>
+        {% if request.user == comment.author or request.user == post.author%}
+          <a class="btn btn-danger" href="{% url 'posts:comment_delete' post.id comment.id%}" role="button">
+            Удалить комментарий
+          </a>
+        {% endif %}
     </div>
+  </div>
 {% endfor %} 

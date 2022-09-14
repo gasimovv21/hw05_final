@@ -3,7 +3,7 @@
 {% block content %}
   <div class="container py-5">
     <h1> Последние обновления избранных авторов на сайте </h1>
-    {% include 'posts/includes/switcher.html' %}
+    {% include 'posts/includes/switcher.html' with follow=True%}
     {% for post in page_obj %}
         {% include 'posts/includes/external_includes/post_includes.html' %}
     {% endfor %}

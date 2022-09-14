@@ -1,21 +1,30 @@
 {% extends "base.html" %}
-{% load static %}
-{% block title %}Об авторе проекта{% endblock %}
+{% block title %}Технологии{% endblock %}
 {% block content %}
-<h1>Автор этого сайта вас приветствует!</h1>
-<p>
-  <h2>
-    И.Ф: Эльтун Гасымов
-  </h2> 
-  <br> 
-  <h3>
-    Нравится программировать на языке программировании Python
-    спасибо всем ребятам из Yandex.Practicum за труд и терпение!
-  </h3> 
-  <br>
-  <h4>
-    Тут вы можете увидеть мой GitHub аккаунт : 
-    <a href="https://github.com/gasimovv21" target="_blank">Github</a>
-  </h4>
-</p>
-{% endblock %} 
+  <div class="row">
+    <h1>Мои знание</h1>
+    <aside class="col-12 col-md-3">
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item">
+          Python
+        </li>
+        <li class="list-group-item">
+          Django
+        </li>
+        <li class="list-group-item">
+          REST API
+        </li>
+        <li class="list-group-item">
+          SQL
+        </li>
+        <li class="list-group-item">
+          API
+        </li>
+      </ul>
+    </aside>
+    <article class="col-12 col-md-9">
+      <p>Для создание этого сайта мне потребовались знание Django, HTML+ CSS, BOOTSTRAP
+      </p>
+    </article>
+  </div>
+{% endblock %}

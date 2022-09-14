@@ -1,35 +1,51 @@
 {% load thumbnail %}
-<article>
-  <ul>
-    <li>
-      Автор:
-      <a
-      {% if not author.posts.count %} 
+{% thumbnail post.image "960x339" crop="center" upscale=True as im %}
+  <img class="card-img my-2" src="{{ im.url }}">
+{% endthumbnail %}
+<div class="card-body">
+  <p class="card-text">
+    <a
+      {% if not author.posts.count %}
+        name="{% url 'posts:post_detail' post.id %}"
         href="{% url 'posts:profile' post.author.username %}"
       {% endif %}
       >
-      {{ post.author.get_full_name }}</a>
-    </li>
-    <li>
-      Дата публикации: {{ post.pub_date|date:"d E Y" }}
-    </li>
-  </ul>
-    {% thumbnail post.image "960x339" crop="center" upscale=True as im %}
-      <img class="card-img my-2" src="{{ im.url }}">
-    {% endthumbnail %}
-    <p>{{ post.text|linebreaks }}</p>
-    <a href="{% url 'posts:post_detail' post.id %}">Подробная информация </a>
-    <br>
-    {% if not group %} 
-      {% if post.group %} 
-        <a href="{% url 'posts:group_list' post.group.slug %}"
-        >
-            <hr>
-              все записи группы  
-        </a>
-      {%else%}
-        <h6><span style="color: red;">Пост не относиться никакой группе </span></h6>  
-      {% endif %}
+      <strong class="d-block text-gray-dark">
+        @{{ post.author }}
+      </strong>
+    </a>
+    {{ post.text }}
+  </p>
+  {% if not group %} 
+    {% if post.group %} 
+      <a
+        class="card-link muted"
+        href="{% url 'posts:group_list' post.group.slug %}">
+        <strong class="d-block text-gray-dark">#{{ post.group }}</strong>
+      </a>
     {% endif %}
-   {% if not forloop.last %}<hr>{% endif %}
-</article>
+  {% endif %}
+  <div class="mb-3 d-flex justify-content-between align-items-center">
+    Комментариев : {{ post.comments.count }}
+  </div>
+  <div class="d-flex justify-content-between align-items-center">
+    <div class="btn-group">
+      <div>
+        <a 
+          class="btn bnt-sm btn-primary ml-1" 
+          href="{% url 'posts:post_detail' post.id %}"
+          role="button">Просмотр публикации
+        </a>
+      </div>
+      {% if request.user == post.author %}
+        <div>
+          <a 
+          class="btn btn-success ml-2"
+          href="{% url 'posts:post_edit' post.pk %}"
+          role="button"> Редактировать или удалить</a>
+        </div>
+      {% endif %}
+    </div>
+    <small class="text-muted">{{ post.pub_date|date:"d E Y" }} г.</small>
+  </div>
+</div>
