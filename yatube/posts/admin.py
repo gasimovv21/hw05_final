@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Group, Post, Comment, Follow
+from .models import Group, Post, Comment, Follow, UserIp
 
 
 class PostAdmin(admin.ModelAdmin):
@@ -50,7 +50,18 @@ class FollowAdmin(admin.ModelAdmin):
     list_filter = ('pub_date',)
 
 
+class UserIpAdmin(admin.ModelAdmin):
+    list_display = (
+        'pk',
+        'Ip',
+        'pub_date',
+    )
+    search_fields = ('Ip',)
+    list_filter = ('pub_date',)
+
+
 admin.site.register(Post, PostAdmin)
 admin.site.register(Group, GroupAdmin)
 admin.site.register(Comment, CommentAdmin)
 admin.site.register(Follow, FollowAdmin)
+admin.site.register(UserIp, UserIpAdmin)

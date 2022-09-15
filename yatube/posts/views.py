@@ -2,7 +2,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, render, redirect
 
 from .forms import PostForm, CommentForm
-from .models import Group, Post, User, Follow, Comment
+from .models import Group, Post, User, Follow, Comment, UserIp
 from .utils import page_obj_func
 
 
@@ -12,6 +12,22 @@ def index(request):
         'page_obj': page_obj_func(request, post_list),
     }
     return render(request, 'posts/index.html', context)
+
+
+def get_client_ip(request):
+    x_forw_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forw_for is not None:
+        ip = x_forw_for.split(',')[0]
+    else:
+        ip = request.META.get('REMOTE_ADDR')
+    return ip
+
+
+def show_client_ip(request):
+    ip_adresse = get_client_ip(request)
+    UserIp.objects.all().create(Ip=ip_adresse)
+
+    return render(request, 'adresse.html', {"ip_adresse":ip_adresse})
 
 
 def group_posts(request, slug):

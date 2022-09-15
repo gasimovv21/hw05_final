@@ -82,3 +82,7 @@ class Follow(CreatedModel):
     class Meta:
         models.UniqueConstraint(fields=['user', 'author'],
                                 name='unique_booking')
+
+
+class UserIp(CreatedModel):
+    Ip = models.CharField(max_length=50)
